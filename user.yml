@@ -1,0 +1,44 @@
+---
+- name: Check and Create MariaDB User if it does not exist
+  hosts: prere
+  become: yes
+
+  vars:
+    db_name: db_akatsuki
+    db_user: yvazi
+    db_password: yvazi
+    db_host: localhost
+    mysql_root_user: root
+    mysql_root_password: root 
+
+  tasks:
+  - name: Créer un utilisateur de base de données
+    ansible.builtin.mysql_user:
+      name: "{{ db_user }}"
+      password: "{{ db_password }}"
+      host: "{{ db_host }}"
+      state: present
+      login_user: "{{ mysql_root_user }}"
+      login_password: "{{ mysql_root_password }}"
+
+
+
+
+    # - name: Check if MariaDB user exists
+    #   community.mysql.mysql_user:
+    #     name: '{{ db_user }}'
+    #     host: '%'
+    #     check_implicit_admin: yes
+    #     state: present
+    #   register: user_exists
+
+    # - name: Create MariaDB user if it does not exist
+    #   community.mysql.mysql_user:
+    #     name: '{{ db_user }}'
+    #     password: '{{ db_password }}'
+    #     host: '%'
+    #     priv: '*.*:ALL'
+    #     state: present
+    #     check_implicit_admin: yes
+    #   when: not user_exists.changed
+
