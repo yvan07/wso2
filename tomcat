@@ -1,0 +1,53 @@
+dnf install -y java-1.8.0-openjdk.x86_64
+
+sudo groupadd tomcat
+
+sudo useradd -d /var/lib/tomcat -r -s /bin/false -g tomcat tomcat
+
+cd /var/lib/ && curl -lO https://archive.apache.org/dist/tomcat/tomcat-8/v8.0.9/bin/apache-tomcat-8.0.9.tar.gz 
+
+
+ln -s /var/lib/apache-tomcat-8.0.9 /var/lib/tomcat
+
+sudo chown -R tomcat: /var/lib/tomcat
+
+sudo chown -R tomcat: /var/lib/apache-tomcat-8.0.9
+
+chcon system_u:object_r:bin_t:s0  /var/lib/tomcat/bin/startup.sh
+
+
+cat <<EOF | tee /etc/systemd/system/tomcat.service
+[Unit]
+
+Description=Tomcat webs servlet container
+
+After=network.target
+
+[Service]
+
+Type=forking
+
+User=tomcat
+
+Group=tomcat
+
+Environment="JAVA_HOME=/usr/lib/jvm/jre" ## a adapter
+
+Environment="JAVA_OPTS=-Djava.awt.headless=true -Djava.security.egd=file:/dev/./urandom"
+
+Environment="CATALINA_BASE=/opt/tomcat"
+
+Environment="CATALINA_HOME=/var/lib/tomcat"
+
+Environment="CATALINA_PID=/var/lib/tomcat/temp/tomcat.pid"
+
+Environment="CATALINA_OPTS= -server -XX:+UseParallelGC"
+
+ExecStart=/var/lib/tomcat/bin/startup.sh
+
+ExecStop=/var/lib/tomcat/bin/shutdown.sh
+
+[Install]
+
+WantedBy=multi-user.target
+```
