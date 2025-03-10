@@ -9,3 +9,34 @@ type = "mysql"
 url = "jdbc:mysql://192.168.3.17:3306/shared_db"
 username = "sharedadmin"
 password = "sharedadmin"
+
+
+curl -LsS https://downloads.mariadb.com/MariaDB/mariadb_repo_setup | sudo bash -s -- --mariadb-server-version=10.5
+
+  ```bash
+  mysql -h <IP_HOTE_MYSQL> -u <NOM_UTILISATEUR> -p
+  ```
+
+  Entrez ensuite le mot de passe lorsque vous y êtes invité.
+
+- Créer la base de données
+
+  ```sql
+  CREATE DATABASE <NOM_BD_APIM>;
+  ```
+
+  **Note** : Il est recommandé d'utiliser une collation de base de données sensible à la casse pour éviter les problèmes lors de la gestion des API dans MySQL.
+
+- Creer les utilisateurs
+
+  ```sql
+  CREATE USER 'apimadmin'@'%' IDENTIFIED BY 'apimadmin';
+  CREATE USER 'sharedadmin'@'%' IDENTIFIED BY 'sharedadmin';
+  ```
+
+- Attribuer des permissions
+
+  ```sql
+  GRANT ALL ON apim_db.* TO 'apimadmin'@'%' IDENTIFIED BY 'apimadmin';
+  GRANT ALL ON shared_db.* TO 'sharedadmin'@'%' IDENTIFIED BY 'sharedadmin';
+  FLUSH PRIVILEGES;
