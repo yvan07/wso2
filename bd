@@ -1,0 +1,11 @@
+[database.apim_db]
+type = "mysql"
+url = "jdbc:mysql://192.168.3.17:3306/apim_db"
+username = "apimadmin"
+password = "apimadmin"
+
+[database.shared_db]
+type = "mysql"
+url = "jdbc:mysql://192.168.3.17:3306/shared_db"
+username = "sharedadmin"
+password = "sharedadmin"
