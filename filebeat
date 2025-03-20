@@ -1,3 +1,14 @@
+- type: log
+enabled: true
+  paths:
+    - (ici tu met le chemin du fichier de log du serveur si il y en a plusieurs tu ajoute en tout ceux qui doivent passé sur kibana)
+  fields:
+    log_type: tomcat
+  fields_under_root: true
+  json.keys_under_root: true
+
+
+
 rpm --import https://artifacts.elastic.co/GPG-KEY-elasticsearch
 
 tee /etc/yum.repos.d/kibana.repo << EOF
