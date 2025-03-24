@@ -1,0 +1,129 @@
+# Installation
+
+## Manuelle
+
+### Configuration
+
+On considere que nous avons un cluster de trois noeud dans cette configuration
+
+192.168.43.81/24
+192.168.43.82/24
+192.168.43.83/24
+
+### firewalld
+
+```
+firewall-cmd --permanent --add-service=mysql
+firewall-cmd --permanent --add-port={4567,4568,4444,873}/tcp
+firewall-cmd --permanent --add-port=4567/udp
+firewall-cmd --reload
+```
+
+* 4444 = pour transferts d'instantanés d'état (SST)
+* 4567 = trafic de réplication du cluster Galera.
+* 4568 = pour le transfert incrémentiel d'état (IST)
+* 3306 = Utilisé pour les connexions client MySQL / MariaDB.
+* 873 = ports Rsync
+
+### hosts
+
+Configurer du fichier host sur chaque Nœud
+
+Ex: avec 3 Noeud
+
+```
+192.168.43.81 gal1
+172.168.43.82 gal2
+192.168.43.83 gal3
+```
+
+### Galera
+
+#### Mariadb
+
+Démarrer, activer, arrêt de mariadB sur tous les nœud
+
+```
+systemctl start mariadb
+systemctl enable mariadb
+mysql_secure_installation
+systemctl stop mariadb
+```
+
+#### Configuration Galera
+
+Configurer le fichier /etc/my.cnf.d/server.cnf sur tous les nœud de la manière suivantes
+
+```
+wsrep_on=ON
+wsrep_provider=/usr/lib64/galera-4/libgalera_smm.so
+wsrep_cluster_address="gcomm://192.168.43.81,192.168.43.82,192.168.43.83"
+binlog_format=row
+default_storage_engine=InnoDB
+innodb_autoinc_lock_mode=2
+wsrep_cluster_name="cluster1"
+wsrep_sst_method=rsync
+wsrep_node_address="192.168.43.81"
+wsrep_node_name="gal1"
+```
+
+#### explication
+
+* wsrep\_on - doit être défini sur ON , pour permettre au nœud particulier de rejoindre le cluster
+* wsrep\_provider - définit l'emplacement de la bibliothèque galera,
+* wsrep\_cluster\_address - les adresses IP de tous les nœuds de cluster Galera
+* binlog\_format : permet de définir le format des logs
+* default\_storage\_engine - les options sont: InnoDB (moteur par défaut de la version 10.2), MyISAM (moteur MySQL hérité), Aria (amélioration moderne de MyISAM)
+* innodb\_autoinc\_lock\_mode : modifie le comportement des verrous
+* wsrep\_cluster\_name - le nom du cluster Galera. il doit être identique sur tous les nœuds qui appartiennent à un meme cluster .
+* wsrep\_sst\_method : la méthode d'échange des données. Rsync est la plus rapide à l'heure actuelle.
+* wsrep\_node\_address - adresse ip du noeud actuel
+* wsrep\_node\_name : le nom de la machine sur laquelle se trouve ce fichier de configuration.
+
+### Demarer le Cluster Galera
+
+Nœud 1 :
+
+```
+galera_new_cluster
+```
+
+Nœud 2 et 3 :
+
+```
+systemctl start mariadb
+```
+
+### Verifier si les noeuds se trouvent dans le cluster
+
+```
+mariadb -u root --execute "SHOW GLOBAL STATUS LIKE 'wsrep_cluster_size';"
+```
+
+Output:
+
+```
++--------------------+-------+
+| Variable_name      | Value |
++--------------------+-------+
+| wsrep_cluster_size | 3     |
++--------------------+-------+
+```
+
+## Via Ansible
+
+Le playbook suivant peut être utilisé afin de déployer un cluster galera sur trois noeuds.
+
+```
+---
+- hosts: galera
+  vars:
+    galera_cluster_name: galera
+    mariadb_version: 10.5
+    mariadb_data_dir: /var/lib/mysql
+    mariadb_innodb_buffer_pool_size_prct: 0.7
+    mariabd_max_connections: 250
+  roles:
+    - role: mariadb-galera-cluster
+      galera_nodes: "{{ play_hosts }}"
+```
