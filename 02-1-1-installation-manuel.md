@@ -135,3 +135,17 @@ chcon system_u:object_r:bin_t:s0 /srv/wso2am/bin/api-manager.sh
 systemctl daemon-reload
 systemctl start  wso2am.service
 ```
+# Key Manager configuration
+[apim.key_manager]
+service_url = "https://[control-plane-LB-host]/services/"
+username = "$ref{super_admin.username}"
+password = "$ref{super_admin.password}"
+
+# Event Hub configurations
+[apim.event_hub]
+enable = true
+username = "$ref{super_admin.username}"
+password = "$ref{super_admin.password}"
+service_url = "https://[control-plane-LB-host]/services/"
+event_listening_endpoints = ["tcp://control-plane-1-host:5672", "tcp://control-plane-2-host:5672"]
+
