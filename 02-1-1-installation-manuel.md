@@ -1,3 +1,20 @@
+```
+[apim.sync_runtime_artifacts.publisher]
+# Par défaut, DBSaver enregistre dans la DB ; si vous mettez true,
+# le Publisher poussera directement les artefacts sur les Gateways
+# sans passer par Traffic Manager.
+publish_directly_to_gateway = true
+
+[apim.sync_runtime_artifacts.gateway]
+# Passez en "sync" pour forcer la Gateway à bloquer son démarrage
+# tant qu’elle n’a pas récupéré tous les artefacts
+data_retrieval_mode   = "sync"
+# Durée maximum (ms) d’attente / retry en cas d’échec
+deployment_retry_duration = 10000
+max_retry_count           = 3
+event_waiting_time        = 1000
+```
+
 
 ## Installation Manuelle avec la base H2 Intégré
 
