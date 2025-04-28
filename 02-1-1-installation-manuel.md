@@ -1,4 +1,42 @@
 ```
+[apim.throttling]
+# Empêche le traitement en double des événements JMS provenant des 4 brokers
+# (chaque TM fait tourner son broker JMS sur le port 5672)
+event_duplicate_url = [
+  "tcp://10.201.10.4:5672",
+  "tcp://10.201.10.5:5672",
+  "tcp://10.201.10.100:5672",
+  "tcp://10.201.10.101:5672"
+]
+
+# Points d'entrée pour récupérer les décisions de throttling (port 9611)
+throttle_decision_endpoints = [
+  "tcp://10.201.10.4:9611",
+  "tcp://10.201.10.5:9611",
+  "tcp://10.201.10.100:9611",
+  "tcp://10.201.10.101:9611"
+]
+
+## Tous vos Traffic Managers répartis en mode 'loadbalance'
+[[apim.throttling.url_group]]
+# Adresse pour envoyer les requêtes de throttling (binaire, 9611)
+traffic_manager_urls = [
+  "tcp://10.201.10.4:9611",
+  "tcp://10.201.10.5:9611",
+  "tcp://10.201.10.100:9611",
+  "tcp://10.201.10.101:9611"
+]
+# Adresse pour l'authentification (SSL, 9711)
+traffic_manager_auth_urls = [
+  "ssl://10.201.10.4:9711",
+  "ssl://10.201.10.5:9711",
+  "ssl://10.201.10.100:9711",
+  "ssl://10.201.10.101:9711"
+]
+type = "loadbalance"
+```
+
+```
 [apim.sync_runtime_artifacts.publisher]
 # Par défaut, DBSaver enregistre dans la DB ; si vous mettez true,
 # le Publisher poussera directement les artefacts sur les Gateways
