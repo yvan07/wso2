@@ -1,4 +1,15 @@
 ```
+[oauth.jwt.renew_token_without_revoking_existing]
+enable = true
+By default only the client_credentials grant type is allowed to generate multiple access tokens. This can be configured by the following configuration.
+
+
+[oauth.jwt.renew_token_without_revoking_existing]
+enable = true
+allowed_grant_types = [“client_credentials”, “password”]
+```
+
+```
 [apim.throttling]
 # Empêche le traitement en double des événements JMS provenant des 4 brokers
 # (chaque TM fait tourner son broker JMS sur le port 5672)
